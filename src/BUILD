@@ -1,11 +1,11 @@
-python_requirement(flask)
-python_requirement(influxdb)
+python_requirement('flask')
+python_requirement('influxdb')
 
 python_binary(
     name = "slow_service",
     source = "slow_service.py",
-    requirements = [
-        pants(":flask"),
-        pants(":influxdb")
+    dependencies = [
+        ":flask",
+        ":influxdb"
     ]
 )
