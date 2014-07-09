@@ -7,12 +7,16 @@ import flask
 import influxdb
 import functools
 
-class Metrics():
+class Metrics(object):
+    """ Class for gathering metrics with decorators """
+
     def __init__(self, influx=None, time_func=time.clock):
+        """ Basic class setup """
         self._influx = influx
         self._time = time_func
-    
+
     def _send_metric(self, series, metric_name, metric_value, metric_time=None):
+        """ Actually submit metrics to the influx server """
         if self._influx is not None:
             if metric_time is None:
                 metric_time = time.time()
@@ -26,8 +30,10 @@ class Metrics():
 
     def execution_time(self, func):
         """ Log the exec time of a function to InfluxDB """
+
         @functools.wraps(func)
         def timed_func(*args, **kwargs):
+            """ Decorated call to func that logs execution time """
             func_name = func.__name__
             invocation_time = time.time()
             start = self._time()
@@ -40,13 +46,15 @@ class Metrics():
 
 
 def predelay(delay=0, random_delay=False):
-    """ A function factory to create a pre-delay decorator 
+    """ A function factory to create a pre-delay decorator
 
     Holy nested closures, Batman!
     """
     def decorator(func):
+        """ Decorator returned by enclosing function """
         @functools.wraps(func)
         def delayed_func(*args, **kwargs):
+            """ Decorated function """
             my_delay = random.random() * delay if random_delay else delay
             time.sleep(my_delay)
             return func(*args, **kwargs)
@@ -56,12 +64,14 @@ def predelay(delay=0, random_delay=False):
     return decorator
 
 def main():
+    """ Main entry point """
     port = None
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
 
     # Set up the metrics gathering object
-    influx = influxdb.client.InfluxDBClient('localhost', 8086, 'testuser', 'testpassword', 'hello_metrics')
+    influx = influxdb.client.InfluxDBClient('localhost', 8086, 'testuser',
+                                            'testpassword', 'hello_metrics')
     metrics = Metrics(influx=influx, time_func=time.time)
 
     # Set up the flask app
