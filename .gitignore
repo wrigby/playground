@@ -1,2 +1,4 @@
 .pants.d
 .python
+.BUILD*
+dist/
