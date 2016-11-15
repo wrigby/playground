@@ -1,5 +1,4 @@
-python_requirement('flask')
-python_requirement('influxdb')
+python_requirements()
 
 python_binary(
     name = "slow_service",
